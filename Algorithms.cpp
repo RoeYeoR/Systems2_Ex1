@@ -1,5 +1,5 @@
-    //315144972
-    //roeyshmil09@gmail.com
+    //     //315144972
+    //     //roeyshmil09@gmail.com
 
     #include <sstream>
     #include <vector>
@@ -57,12 +57,13 @@
     }
 
     std::string Algorithms::shortestPath(const Graph& g, int start, int end) {
-    if (g.containsNegativeWeights()) {
-            return bellmanFord(g, start, end);
-        } else {
-            return dijkstra(g, start, end);
+        if (g.containsNegativeWeights()) {
+                return bellmanFord(g, start, end);
+            } else {
+                return dijkstra(g, start, end);
+            }
         }
-    }
+
     std::string Algorithms::dijkstra(const Graph& g, int start, int end) {
         int n = g.get_adjMatrix().size();
         std::vector<int> dist(n, std::numeric_limits<int>::max());
@@ -101,7 +102,7 @@
         std::vector<int> prev(n, -1);
         dist[start] = 0;
 
-        for (int i = 1; i < n; ++i) {
+        for (int i = 0; i < n-1; ++i) {
             for (int u = 0; u < n; ++u) {
                 for (int v = 0; v < n; ++v) {
                     if (g.get_adjMatrix()[u][v] != 0 && dist[u] != std::numeric_limits<int>::max() && dist[u] + g.get_adjMatrix()[u][v] < dist[v]) {
@@ -115,7 +116,6 @@
         for (int u = 0; u < n; ++u) {
             for (int v = 0; v < n; ++v) {
                 if (g.get_adjMatrix()[u][v] != 0 && dist[u] != std::numeric_limits<int>::max() && dist[u] + g.get_adjMatrix()[u][v] < dist[v]) {
-                    std::cout << "Graph contains a negative weight cycle" << std::endl;
                     return "-1";
                 }
             }
@@ -127,6 +127,7 @@
             return addPath(prev, start, end);
         }
     }
+
     std::string Algorithms::addPath(const std::vector<int>& prev, int start, int end) {
         std::vector<int> path;
         for (int at = end; at != -1; at = prev[at]) {
@@ -149,6 +150,11 @@
         std::vector<bool> visited(n, false);
         std::vector<int> parent(n, -1);
 
+        // Check for negative cycles using Bellman-Ford
+        if (g.containsNegativeWeights() && bellmanFord_DetectCycle(g, parent)) {
+            return "The graph contains a negative cycle";
+        }
+
         if(g.get_is_directed())
         {
             // Check for cycles in a directed graph using DFS
@@ -169,13 +175,11 @@
         }
 
         }
-        // Check for negative weight cycles using Bellman-Ford
-        if (g.containsNegativeWeights() && bellmanFord_DetectCycle(g, parent)) {
-            return "The graph contains a negative weight cycle";
-        }
-
+        
         return "0";
     }
+
+
     bool Algorithms::DFS_Directed(const Graph& g, int v, std::vector<bool>& visited, std::vector<int>& parent) {
         static std::vector<bool> recStack(g.get_adjMatrix().size(), false);
         
@@ -199,7 +203,7 @@
         return false;
     }
 
-        bool Algorithms::DFS_Undirected(const Graph& g, int v, std::vector<bool>& visited, std::vector<int>& parent, int parentVertex) {
+    bool Algorithms::DFS_Undirected(const Graph& g, int v, std::vector<bool>& visited, std::vector<int>& parent, int parentVertex) {
         visited[v] = true;
 
         for (int u = 0; u < g.get_adjMatrix().size(); ++u) {
@@ -218,40 +222,36 @@
         return false;
     }
 
-        bool Algorithms::bellmanFord_DetectCycle(const Graph& g, std::vector<int>& parent) {
-            int n = g.get_adjMatrix().size();
-    std::vector<int> dist(n, std::numeric_limits<int>::max());
-    parent.resize(n, -1);
+    bool Algorithms::bellmanFord_DetectCycle(const Graph& g, std::vector<int>& parent) {
+        int n = g.get_adjMatrix().size();
+        std::vector<int> dist(n, std::numeric_limits<int>::max());
+        dist[0] = 0;
 
-    dist[0] = 0;
-
-    // Relax edges |V| - 1 times
-    for (int i = 0; i < n - 1; ++i) {
-        for (int u = 0; u < n; ++u) {
-            for (int v = 0; v < n; ++v) {
-                if (g.get_adjMatrix()[u][v] != 0 && dist[u] != std::numeric_limits<int>::max() && dist[u] + g.get_adjMatrix()[u][v] < dist[v]) {
-                    dist[v] = dist[u] + g.get_adjMatrix()[u][v];
-                    parent[v] = u;
+        // Relax all edges (n-1) times
+        for (int i = 0; i < n - 1; ++i) {
+            for (int u = 0; u < n; ++u) {
+                for (int v = 0; v < n; ++v) {
+                    if (g.get_adjMatrix()[u][v] != 0 && dist[u] != std::numeric_limits<int>::max() && dist[u] + g.get_adjMatrix()[u][v] < dist[v]) {
+                        dist[v] = dist[u] + g.get_adjMatrix()[u][v];
+                        parent[v] = u;
+                    }
                 }
             }
         }
-    }
 
-    // Check for negative-weight cycles
-    bool hasNegativeCycle = false;
-    for (int u = 0; u < n; ++u) {
-        for (int v = 0; v < n; ++v) {
-            if (g.get_adjMatrix()[u][v] != 0 && dist[u] != std::numeric_limits<int>::max() && dist[u] + g.get_adjMatrix()[u][v] < dist[v]) {
-                parent[v] = u;
-                hasNegativeCycle = true;
+        // Check for negative weight cycles
+        for (int u = 0; u < n; ++u) {
+            for (int v = 0; v < n; ++v) {
+                if (g.get_adjMatrix()[u][v] != 0 && dist[u] != std::numeric_limits<int>::max() && dist[u] + g.get_adjMatrix()[u][v] < dist[v]) {
+                    return true;
+                }
             }
         }
+
+        return false;
     }
 
-    return hasNegativeCycle;
-    }
-
-        std::string Algorithms::addCycle(const std::vector<int>& parent, int start) {
+    std::string Algorithms::addCycle(const std::vector<int>& parent, int start) {
         std::vector<int> cycle;
         int current = start;
 
@@ -276,127 +276,84 @@
 
 
     std::string Algorithms::isBipartite(const Graph& g) {
-    int n = g.get_adjMatrix().size();
-    std::vector<int> color(n, -1);
-    std::unordered_set<int> A, B;
+        int n = g.get_adjMatrix().size();
+        std::vector<int> color(n, -1);
+        std::unordered_set<int> A, B;
 
-    for (int i = 0; i < n; i++) {
-        if (color[i] == -1) {
-            if (!BFS_Bipartite(g, i, color, A, B)) {
-                return "0";
+        for (int i = 0; i < n; i++) {
+            if (color[i] == -1) {
+                if (!BFS_Bipartite(g, i, color, A, B)) {
+                    return "0";
+                }
             }
+    }
+
+        // Sort in ascending order the vertices in sets A and B
+        std::vector<int> sortedA(A.begin(), A.end());
+        std::sort(sortedA.begin(), sortedA.end());
+        std::vector<int> sortedB(B.begin(), B.end());
+        std::sort(sortedB.begin(), sortedB.end());
+
+        // add the output string representing the bipartite sets
+        std::ostringstream result;
+        result << "The graph is bipartite: A={";
+        for (int vertex = 0 ;vertex <sortedA.size()-1; vertex++) {
+            result << sortedA[vertex] << ", ";
         }
-    }
+        result << sortedA[sortedA.size()-1] << "}, B={";
 
-    // Sort in ascending order the vertices in sets A and B
-    std::vector<int> sortedA(A.begin(), A.end());
-    std::sort(sortedA.begin(), sortedA.end());
-    std::vector<int> sortedB(B.begin(), B.end());
-    std::sort(sortedB.begin(), sortedB.end());
+        for (int vertex = 0 ;vertex <sortedB.size()-1; vertex++) {
+            result << sortedB[vertex] << ", ";
+        }
+        result <<sortedB[sortedB.size()-1] << "}";
 
-    // add the output string representing the bipartite sets
-    std::ostringstream result;
-    result << "The graph is bipartite: A={";
-    for (int vertex = 0 ;vertex <sortedA.size()-1; vertex++) {
-        result << sortedA[vertex] << ", ";
-    }
-    result << sortedA[sortedA.size()-1] << "}, B={";
-
-    for (int vertex = 0 ;vertex <sortedB.size()-1; vertex++) {
-        result << sortedB[vertex] << ", ";
-    }
-    result <<sortedB[sortedB.size()-1] << "}";
-
-    return result.str();
+        return result.str();
     }
 
     bool Algorithms::BFS_Bipartite(const Graph& g, int start, std::vector<int>& color, std::unordered_set<int>& A, std::unordered_set<int>& B) {
-            std::queue<int> q;
-    q.push(start);
-    color[start] = 0; 
-    A.insert(start); 
+        std::queue<int> q;
+        q.push(start);
+        color[start] = 0; 
+        A.insert(start); 
 
-    while (!q.empty()) {
-        int u = q.front();
-        q.pop();
+        while (!q.empty()) {
+            int u = q.front();
+            q.pop();
 
-        for (int v = 0; v < g.get_adjMatrix().size(); ++v) {
-            if (g.get_adjMatrix()[u][v] != 0) {
-                // If adjacent vertex v is not colored, color it with opposite color of u
-                if (color[v] == -1) {
-                    color[v] = 1 - color[u];
-                    if (color[v] == 0) {
-                        A.insert(v);
-                    } else {
-                        B.insert(v);
+            for (int v = 0; v < g.get_adjMatrix().size(); ++v) {
+                if (g.get_adjMatrix()[u][v] != 0) {
+                    // If adjacent vertex v is not colored, color it with opposite color of u
+                    if (color[v] == -1) {
+                        color[v] = 1 - color[u];
+                        if (color[v] == 0) {
+                            A.insert(v);
+                        } else {
+                            B.insert(v);
+                        }
+                        q.push(v);
                     }
-                    q.push(v);
-                }
-                // If adjacent vertex v is already colored with the same color as u, then the graph is not bipartite
-                else if (color[v] == color[u]) {
-                    return false;
+                    // If adjacent vertex v is already colored with the same color as u, then the graph is not bipartite
+                    else if (color[v] == color[u]) {
+                        return false;
+                    }
                 }
             }
         }
-    }
 
-    return true;
+        return true;
     }
 
     std::string Algorithms::negativeCycle(const Graph& g) {
-     int n = g.get_adjMatrix().size();
-    std::vector<int> dist(n, std::numeric_limits<int>::max());
-    std::vector<int> parent(n, -1);
+       
+        std::string result = isContainsCycle(g);
 
-    // Run Bellman-Ford algorithm to detect negative cycles
-    if (!bellmanFord_DetectCycle(g, parent)) {
-        return "There is no negative cycle in the graph.";
-    } else {
-        // Find a vertex that is part of the negative cycle
-        int cycleStart = -1;
-        for (int u = 0; u < n; ++u) {
-            for (int v = 0; v < n; ++v) {
-                if (g.get_adjMatrix()[u][v] != 0 && dist[u] != std::numeric_limits<int>::max() && dist[u] + g.get_adjMatrix()[u][v] < dist[v]) {
-                    cycleStart = v;
-                    break;
-                }
-            }
-            if (cycleStart != -1) {
-                break;
-            }
+        
+        if (result == "The graph contains a negative cycle") {
+            return result;
         }
 
-        // Find the negative cycle using parent pointers
-        int current = cycleStart;
-        std::vector<int> cycle;
-        std::vector<bool> visited(n, false);
+        // If no negative cycle is found, return a message indicating this
+        return "The graph does not contain any negative cycles";
 
-        while (!visited[current]) {
-            visited[current] = true;
-            current = parent[current];
-        }
-
-        int cycleEnd = current;
-        cycle.push_back(cycleEnd);
-        current = parent[cycleEnd];
-
-        while (current != cycleEnd) {
-            cycle.push_back(current);
-            current = parent[current];
-        }
-        cycle.push_back(cycleEnd);
-
-        // Convert cycle to string
-        std::ostringstream result;
-        result << "Negative cycle found: ";
-        for (int i = cycle.size() - 1; i >= 0; --i) {
-            result << cycle[i] << " ";
-        }
-
-        return result.str();
-    
-    } 
-
- }
-
-}
+    }
+    } // namespace ariel
