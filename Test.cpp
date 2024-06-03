@@ -105,6 +105,15 @@ TEST_CASE("Test shortestPath") {
 
     g.loadGraph(graph5);
     CHECK(ariel::Algorithms::shortestPath(g, 0, 3) == "0->2->3");
+
+    // Test Case 5: No path in directed graph
+    vector<vector<int>> graph6 = {
+    {0, 1, -1},
+    {1, 0, 2},
+    {-1, 2, 0}};
+
+    g.loadGraph(graph6);
+    CHECK(ariel::Algorithms::shortestPath(g, 0, 2) == "-1");
 }
 
 TEST_CASE("Test isContainsCycle") {
@@ -193,54 +202,63 @@ TEST_CASE("Test isBipartite") {
     g.loadGraph(graph5);
     CHECK(ariel::Algorithms::isBipartite(g) == "The graph is bipartite: A={0, 3}, B={1, 2}");
 }
-// TEST_CASE("Test negeative cycles")
-// {
-//     ariel::Graph g1;
-//     vector<vector<int>> graph1 = {
-//     {0, -1, 4, 0, 0},
-//     {0, 0, 3, 2, 2},
-//     {0, 0, 0, 0, 0},
-//     {0, 1, 5, 0, 0},
-//     {0, 0, 0, -3, 0}
-//     };
-//     g1.loadGraph(graph1);
-//     CHECK(ariel::Algorithms::negativeCycle(g1) == "Negative cycle found: 3 1 4 3");
 
-//     ariel::Graph g2;
-// vector<vector<int>> graph2 = {
-//     {0, -1, 4, 0, 0},
-//     {0, 0, 3, 2, 2},
-//     {0, 0, 0, 0, 0},
-//     {0, 1, 5, -10, 0},
-//     {0, 0, 0, -3, 0}
-// };
-// g2.loadGraph(graph2);
-// CHECK(ariel::Algorithms::negativeCycle(g2) == "Negative cycle found: 3 1 4 3");
+TEST_CASE("Test negative cycles")
+{
+    ariel::Graph g1;
+    vector<vector<int>> graph1 = {
+        {0, -1, 4, 0, 0},
+        {0, 0, 3, 2, 2},
+        {0, 0, 0, 0, 0},
+        {0, 1, 5, 0, 0},
+        {0, 0, 0, -5, 0}
+    };
+    g1.loadGraph(graph1);
+    CHECK(ariel::Algorithms::negativeCycle(g1) == "The graph contains a negative cycle");
 
-// ariel::Graph g3;
-// vector<vector<int>> graph3 = {
-//     {0, -1, 4, 0, 0},
-//     {0, 0, 3, 2, 2},
-//     {0, 0, 0, 0, 0},
-//     {0, 1, 5, 0, 0},
-//     {0, 0, 0, -3, 0}
-// };
-// g3.loadGraph(graph3);
-// CHECK(ariel::Algorithms::negativeCycle(g3) == "There is no negative cycle in the graph.");
+    ariel::Graph g2;
+    vector<vector<int>> graph2 = {
+        {0, 1, 4, 0, 0},
+        {0, 0, 3, 2, 2},
+        {0, 0, 0, 0, 0},
+        {0, 1, 5, 0, 0},
+        {0, 0, 0, 1, 0}
+    };
+    g2.loadGraph(graph2);
+    CHECK(ariel::Algorithms::negativeCycle(g2) == "The graph does not contain any negative cycles");
 
-// ariel::Graph g4;
-// vector<vector<int>> graph4 = {
-//     {0, -1, 4, 0},
-//     {0, 0, 3, 2},
-//     {0, 0, 0, 0},
-//     {0, 1, 5, -6}
-// };
-// g4.loadGraph(graph4);
-// CHECK(ariel::Algorithms::negativeCycle(g4) == "Negative cycle found: 3 1 0 3");
+    ariel::Graph g3;
+    vector<vector<int>> graph3 = {
+        {0, 2, 0},
+        {0, 0, 1},
+        {-4, 0, 0}
+       
+    };
+    g3.loadGraph(graph3);
+    CHECK(ariel::Algorithms::negativeCycle(g3) == "The graph contains a negative cycle");
 
+    ariel::Graph g4;
+    vector<vector<int>> graph4 = {
+        {0, 1, 0, 0, 0},
+        {0, 0, 1, 0, 0},
+        {0, 0, 0, 1, 0},
+        {0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0}
+    };
+    g4.loadGraph(graph4);
+    CHECK(ariel::Algorithms::negativeCycle(g4) == "The graph does not contain any negative cycles");
 
-
-// }
+    ariel::Graph g5;
+    vector<vector<int>> graph5 = {
+        {0, 3, 0, 0, -4},
+        {0, 0, 2, 0, 0},
+        {0, 0, 0, 1, 0},
+        {0, -5, 0, 0, 0},
+        {0, 0, 0, 0, 0}
+    };
+    g5.loadGraph(graph5);
+    CHECK(ariel::Algorithms::negativeCycle(g5) == "The graph contains a negative cycle");
+}
 
 
 TEST_CASE("Test invalid Graph")
