@@ -54,9 +54,6 @@
         }
 
         return visitedCount == n;
-        }
-
-        return visitedCount == n;
     }
 
     std::string Algorithms::shortestPath(const Graph& g, int start, int end) {

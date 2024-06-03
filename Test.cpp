@@ -146,13 +146,13 @@ TEST_CASE("Test isContainsCycle") {
 
    
 
-     // Test Case 5: No cycle in directed graph
-    vector<vector<int>> graph5 = {
+     // Test Case 4: No cycle in directed graph
+    vector<vector<int>> graph4 = {
         {0, 1, 1, 0},
         {0, 0, 0, 1},
         {0, 0, 0, 1},
         {0, 0, 0, 0}};
-    g.loadGraph(graph5);
+    g.loadGraph(graph4);
     CHECK(ariel::Algorithms::isContainsCycle(g) == "0");
 }
 
