@@ -7,6 +7,7 @@
 namespace ariel {
 
     Graph::Graph() {}
+    Graph::Graph(int n) : adjMatrix(n, std::vector<int>(n, 0)) {}
 
     bool Graph::get_is_directed() const
     {
