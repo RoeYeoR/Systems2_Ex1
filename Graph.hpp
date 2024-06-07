@@ -19,7 +19,7 @@ class Graph {
 
     public:
         Graph();
-        Graph(int n) : adjMatrix(n, std::vector<int>(n, 0)) {}
+        Graph(int n);
         bool get_is_directed() const;
         std::vector<std::vector<int>> get_adjMatrix() const;
         int countEdges() const;
