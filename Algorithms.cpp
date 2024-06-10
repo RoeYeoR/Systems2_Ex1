@@ -102,6 +102,7 @@
         std::vector<int> prev(n, -1);
         dist[start] = 0;
 
+        //Relax the edges |n-1| times
         for (int i = 0; i < n-1; ++i) {
             for (int u = 0; u < n; ++u) {
                 for (int v = 0; v < n; ++v) {
@@ -112,7 +113,8 @@
                 }
             }
         }
-
+        //iterate for the n'th time to check if there is still an option to relax some edges.
+        // if a relax exist, means negative cycle 
         for (int u = 0; u < n; ++u) {
             for (int v = 0; v < n; ++v) {
                 if (g.get_adjMatrix()[u][v] != 0 && dist[u] != std::numeric_limits<int>::max() && dist[u] + g.get_adjMatrix()[u][v] < dist[v]) {
@@ -158,10 +160,10 @@
         if(g.get_is_directed())
         {
             // Check for cycles in a directed graph using DFS
-        for (int i = 0; i < n; ++i) {
-            if (DFS_Directed(g, i, visited, parent)) {
-                return addCycle(parent, i);
-            }
+            for (int i = 0; i < n; ++i) {
+                if (DFS_Directed(g, i, visited, parent)) {
+                    return addCycle(parent, i);
+                }
         }
 
         }
@@ -239,7 +241,7 @@
             }
         }
 
-        // Check for negative weight cycles
+        // Check for negative cycles
         for (int u = 0; u < n; ++u) {
             for (int v = 0; v < n; ++v) {
                 if (g.get_adjMatrix()[u][v] != 0 && dist[u] != std::numeric_limits<int>::max() && dist[u] + g.get_adjMatrix()[u][v] < dist[v]) {
@@ -352,7 +354,6 @@
             return result;
         }
 
-        // If no negative cycle is found, return a message indicating this
         return "The graph does not contain any negative cycles";
 
     }

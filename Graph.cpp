@@ -83,6 +83,14 @@ namespace ariel {
         {
             throw std::invalid_argument("Invalid graph: The graph is not a square matrix.");
         }
+        //check if there is a vertex with dist to itself !=0
+        for(int i=0; i<adj_Mat.size();i++)
+        {
+            if(adj_Mat[i][i] != 0)
+            {
+             throw std::invalid_argument("Invalid graph: At least one vertex with distance to itself != 0.");
+            }
+        }
 
         adjMatrix = adj_Mat;
         is_directed = isDirected(adjMatrix);

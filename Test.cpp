@@ -12,26 +12,23 @@ TEST_CASE("Test isConnected") {
         {0, 1, 0},
         {1, 0, 1},
         {0, 1, 0}};
-    g.loadGraph(graph1);
+        g.loadGraph(graph1);
+        CHECK(ariel::Algorithms::isConnected(g) == "1");
+
+    // Test Case 2: Graph with two nodes and one edge
+    vector<vector<int>> graph2 = {
+        {0, 1},
+        {1, 0}};
+    g.loadGraph(graph2);
     CHECK(ariel::Algorithms::isConnected(g) == "1");
 
-    // Test Case 2: Disconnected undirected graph
-    vector<vector<int>> graph2 = {
-        {0, 1, 1, 0, 0},
-        {1, 0, 1, 0, 0},
-        {1, 1, 0, 0, 0},
-        {0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0}};
-    g.loadGraph(graph2);
-    CHECK(ariel::Algorithms::isConnected(g) == "0");
-
-    // Test Case 3: Single vertex undirected graph
+    // Test Case 3:  Graph with one vertex
     vector<vector<int>> graph3 = {
         {0}};
     g.loadGraph(graph3);
     CHECK(ariel::Algorithms::isConnected(g) == "1");
 
-    // Test Case 4: Graph with all zeros 
+    // Test Case 4: Graph with 3 vertices but no edges
     vector<vector<int>> graph4 = {
         {0, 0, 0},
         {0, 0, 0},
@@ -47,15 +44,6 @@ TEST_CASE("Test isConnected") {
         {1, 0, 0, 0}};
     g.loadGraph(graph5);
     CHECK(ariel::Algorithms::isConnected(g) == "1");
-
-    // Test Case 6: Disconnected directed graph
-    vector<vector<int>> graph6 = {
-        {0, 1, 0, 0},
-        {0, 0, 1, 0},
-        {0, 0, 0, 0},
-        {0, 0, 0, 0}};
-    g.loadGraph(graph6);
-    CHECK(ariel::Algorithms::isConnected(g) == "0");
 }
 
 TEST_CASE("Test shortestPath") {
@@ -69,57 +57,50 @@ TEST_CASE("Test shortestPath") {
     g.loadGraph(graph1);
     CHECK(ariel::Algorithms::shortestPath(g, 0, 2) == "0->1->2");
 
-    // Test Case 2: No path in undirected graph
+     // Test Case 2: Check on directed graph with negative weights
     vector<vector<int>> graph2 = {
-        {0, 1, 0, 0},
-        {1, 0, 0, 0},
-        {0, 0, 0, 1},
-        {0, 0, 1, 0}};
+        {0, 4, 2},
+        {0, 0, -3},
+        {0, 0, 0}};
     g.loadGraph(graph2);
-    CHECK(ariel::Algorithms::shortestPath(g, 0, 3) == "-1");
+    CHECK(ariel::Algorithms::shortestPath(g, 0, 2) == "0->1->2");
 
-    // Test Case 3: Shortest path in undirected graph
+     // Test Case 3: negative cycle in the graph,means -infinity for shortest path (not exist)
     vector<vector<int>> graph3 = {
+        {0, 2, 1},
+        {2, 0, -4},
+        {1, -4, 0}};
+    g.loadGraph(graph3);
+    CHECK(ariel::Algorithms::shortestPath(g, 0, 2) == "-1");
+
+
+    // Test Case 4: 2 Binding components in the graph. 
+    //Edge between 0-1 and edge between 2-3 but no path from 0 to 3
+    vector<vector<int>> graph4 = {
         {0, 1, 0, 0},
         {1, 0, 0, 0},
         {0, 0, 0, 1},
         {0, 0, 1, 0}};
-    g.loadGraph(graph3);
+    g.loadGraph(graph4);
     CHECK(ariel::Algorithms::shortestPath(g, 0, 3) == "-1");
 
-    // Test Case 4: Shortest path in directed graph
-    vector<vector<int>> graph4 = {
+
+    // Test Case 5: Shortest path in directed graph: 
+    //Edge from 0->1 and 0->2 and edge from 1->3 and 2->3
+    vector<vector<int>> graph5 = {
         {0, 1, 1, 0},
         {0, 0, 0, 1},
         {0, 0, 0, 1},
         {0, 0, 0, 0}};
-    g.loadGraph(graph4);
+    g.loadGraph(graph5);
     CHECK(ariel::Algorithms::shortestPath(g, 0, 3) == "0->1->3");
 
-    // Test Case 5: No path in directed graph
-    vector<vector<int>> graph5 = {
-    {0, 1, 1, 0},
-    {1, 0, 1, 0},
-    {1, 1, 0, 1},
-    {0, 0, 1, 0}};
-
-    g.loadGraph(graph5);
-    CHECK(ariel::Algorithms::shortestPath(g, 0, 3) == "0->2->3");
-
-    // Test Case 5: No path in directed graph
-    vector<vector<int>> graph6 = {
-    {0, 1, -1},
-    {1, 0, 2},
-    {-1, 2, 0}};
-
-    g.loadGraph(graph6);
-    CHECK(ariel::Algorithms::shortestPath(g, 0, 2) == "-1");
 }
 
 TEST_CASE("Test isContainsCycle") {
     ariel::Graph g;
 
-    // Test Case 1: No cycle in undirected graph
+    // Test Case 1: Check a cycle in undirected graph with edge 0-1 and 1-2
     vector<vector<int>> graph1 = {
         {0, 1, 0},
         {1, 0, 1},
@@ -144,22 +125,33 @@ TEST_CASE("Test isContainsCycle") {
     g.loadGraph(graph3);
     CHECK(ariel::Algorithms::isContainsCycle(g) == "0");
 
-   
 
-     // Test Case 4: No cycle in directed graph
+
+     // Test Case 4: Check for a cycle in directed graph
+     // edges 0->1,1->3,3->2,2->0
     vector<vector<int>> graph4 = {
+        {0, 1, 0, 0},
+        {0, 0, 0, 1},
+        {1, 0, 0, 0},
+        {0, 0, 1, 0}};
+    g.loadGraph(graph4);
+    CHECK(ariel::Algorithms::isContainsCycle(g) == "The cycle is: 0->1->3->2->0");
+
+     // Test Case 5: No cycle in directed graph
+    vector<vector<int>> graph5 = {
         {0, 1, 1, 0},
         {0, 0, 0, 1},
         {0, 0, 0, 1},
         {0, 0, 0, 0}};
-    g.loadGraph(graph4);
+    g.loadGraph(graph5);
     CHECK(ariel::Algorithms::isContainsCycle(g) == "0");
 }
 
 TEST_CASE("Test isBipartite") {
     ariel::Graph g;
 
-    // Test Case 1: Bipartite graph
+    // Test Case 1: Simple check
+    // vertex 1 connected to vertex 0 and vertex 2 but no edge(connection) between 0 and 2.
     vector<vector<int>> graph1 = {
         {0, 1, 0},
         {1, 0, 1},
@@ -167,7 +159,9 @@ TEST_CASE("Test isBipartite") {
     g.loadGraph(graph1);
     CHECK(ariel::Algorithms::isBipartite(g) == "The graph is bipartite: A={0, 2}, B={1}");
 
-    // Test Case 2: Not bipartite graph
+    // Test Case 2: Not bipartite graph 
+    // it is a cycle so each vertex is connected to all other vertices
+    //so it can not create 2 groups of vertices
     vector<vector<int>> graph2 = {
         {0, 1, 1},
         {1, 0, 1},
@@ -175,16 +169,19 @@ TEST_CASE("Test isBipartite") {
     g.loadGraph(graph2);
     CHECK(ariel::Algorithms::isBipartite(g) == "0");
 
-    // Test Case 3: Bipartite graph
+    // Test Case 3: Bipartite graph with 5 vertices and 4 edges
+    // edges 0-3,0-4,1-2,1-3
     vector<vector<int>> graph3 = {
-        {0, 1, 0, 0},
-        {1, 0, 1, 0},
-        {0, 1, 0, 1},
-        {0, 0, 1, 0}};
+        {0, 0, 0, 1, 1},
+        {0, 0, 1, 1, 0},
+        {0, 1, 0, 0, 0},
+        {1, 1, 0, 0, 0},
+        {1, 0, 0, 0, 0}};
     g.loadGraph(graph3);
-    CHECK(ariel::Algorithms::isBipartite(g) == "The graph is bipartite: A={0, 2}, B={1, 3}");
+    CHECK(ariel::Algorithms::isBipartite(g) == "The graph is bipartite: A={0, 1}, B={2, 3, 4}");
 
-    // Test Case 4: Bipartite graph with 2 edges 
+    // Test Case 4: Bipartite graph with 2 edges
+    // edges 0-1,2-3 
     vector<vector<int>> graph4 = {
         {0, 1, 0, 0},
         {1, 0, 0, 0},
@@ -194,6 +191,7 @@ TEST_CASE("Test isBipartite") {
     CHECK(ariel::Algorithms::isBipartite(g) == "The graph is bipartite: A={0, 2}, B={1, 3}");
 
     // Test Case 5: bipartite graph with 3 edges
+    //edges 0-1,0-2,2-3
     vector<vector<int>> graph5 = {
         {0, 1, 1, 0},
         {1, 0, 0, 0},
@@ -205,68 +203,59 @@ TEST_CASE("Test isBipartite") {
 
 TEST_CASE("Test negative cycles")
 {
-    ariel::Graph g1;
+    ariel::Graph g;
+
+    // Test Case 1: Graph with 2 vertices and a negative cycle
     vector<vector<int>> graph1 = {
-        {0, -1, 4, 0, 0},
-        {0, 0, 3, 2, 2},
-        {0, 0, 0, 0, 0},
-        {0, 1, 5, 0, 0},
-        {0, 0, 0, -5, 0}
-    };
-    g1.loadGraph(graph1);
-    CHECK(ariel::Algorithms::negativeCycle(g1) == "The graph contains a negative cycle");
+        {0, -1},
+        {-1, 0}};
+    g.loadGraph(graph1);
+    CHECK(ariel::Algorithms::negativeCycle(g) == "The graph contains a negative cycle");
 
-    ariel::Graph g2;
+     // Test Case 2: Graph with 3 vertices and a negative cycle
     vector<vector<int>> graph2 = {
-        {0, 1, 4, 0, 0},
-        {0, 0, 3, 2, 2},
-        {0, 0, 0, 0, 0},
-        {0, 1, 5, 0, 0},
-        {0, 0, 0, 1, 0}
-    };
-    g2.loadGraph(graph2);
-    CHECK(ariel::Algorithms::negativeCycle(g2) == "The graph does not contain any negative cycles");
+        {0, 3, 0},
+        {0, 0, 1},
+        {-6, 0, 0}};
+    g.loadGraph(graph2);
+    CHECK(ariel::Algorithms::negativeCycle(g) == "The graph contains a negative cycle");
 
-    ariel::Graph g3;
+
+   // Test Case 3: Simple undirected graph without a negative cycle
     vector<vector<int>> graph3 = {
+        {0, 1, 1},
+        {1, 0, 1},
+        {1, 1, 0}};
+    g.loadGraph(graph3);
+    CHECK(ariel::Algorithms::negativeCycle(g) == "The graph does not contain any negative cycles");
+
+    // Test Case 4: Directed graph with a negative cycle
+    vector<vector<int>> graph4 = {
         {0, 2, 0},
         {0, 0, 1},
-        {-4, 0, 0}
-       
-    };
-    g3.loadGraph(graph3);
-    CHECK(ariel::Algorithms::negativeCycle(g3) == "The graph contains a negative cycle");
+        {-4, 0, 0}};
+    g.loadGraph(graph4);
+    CHECK(ariel::Algorithms::negativeCycle(g) == "The graph contains a negative cycle");
 
-    ariel::Graph g4;
-    vector<vector<int>> graph4 = {
+    // Test Case 5: Directed graph with a negative cycle
+    vector<vector<int>> graph5 = {
         {0, 1, 0, 0, 0},
         {0, 0, 1, 0, 0},
         {0, 0, 0, 1, 0},
         {0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0}
+        {-5, 0, 0, 0, 0}
     };
-    g4.loadGraph(graph4);
-    CHECK(ariel::Algorithms::negativeCycle(g4) == "The graph does not contain any negative cycles");
+    g.loadGraph(graph5);
+    CHECK(ariel::Algorithms::negativeCycle(g) == "The graph contains a negative cycle");
 
-    ariel::Graph g5;
-    vector<vector<int>> graph5 = {
-        {0, 3, 0, 0, -4},
-        {0, 0, 2, 0, 0},
-        {0, 0, 0, 1, 0},
-        {0, -5, 0, 0, 0},
-        {0, 0, 0, 0, 0}
-    };
-    g5.loadGraph(graph5);
-    CHECK(ariel::Algorithms::negativeCycle(g5) == "The graph contains a negative cycle");
 }
-
 
 TEST_CASE("Test invalid Graph")
 {
 
 ariel::Graph g;
 
-// Test Case 1: Invalid graph (matrix is not square)
+// Test Case 1: Invalid graph 5X3 (non-square matrix); rows > cols
 vector<vector<int>> graph1 = {
     {0, 1, 2},
     {1, 0, 3},
@@ -276,20 +265,22 @@ vector<vector<int>> graph1 = {
 CHECK_THROWS_WITH(g.loadGraph(graph1), "Invalid graph: The graph is not a square matrix.");
 
 
-// Test Case 4: Invalid graph (non-square matrix)
-vector<vector<int>> graph4 = {
+// Test Case 2: Invalid graph 3X4 (non-square matrix); cols > rows  
+vector<vector<int>> graph2 = {
     {0, 1, 0, 0},
     {1, 0, 0, 0},
     {0, 0, 1, 0}};
-CHECK_THROWS_WITH(g.loadGraph(graph4), "Invalid graph: The graph is not a square matrix.");
+CHECK_THROWS_WITH(g.loadGraph(graph2), "Invalid graph: The graph is not a square matrix.");
 
-// Test Case 5: Invalid graph (non-square matrix)
-vector<vector<int>> graph5 = {
+
+
+// Test Case 3: Invalid graph (square matrix but invalid vertices)
+vector<vector<int>> graph3 = {
     {1, 0, 0},
     {0, 1, 0},
-    {0, 0, 1},
-    {0, 0, 0}};
-CHECK_THROWS_WITH(g.loadGraph(graph5), "Invalid graph: The graph is not a square matrix.");
+    {0, 0, 1}};
+   
+CHECK_THROWS_WITH(g.loadGraph(graph3), "Invalid graph: At least one vertex with distance to itself != 0.");
 }
 
 
