@@ -45,11 +45,9 @@ namespace ariel {
     }
         int Graph::countEdges() const {
         int numOfEdges = 0;
-        int numOfVertices = adjMatrix.size();
 
-        
-        for (int i = 0; i < numOfVertices; i++) {
-            for (int j = 0; j < numOfVertices; j++) {
+        for (int i = 0; i < adjMatrix.size(); i++) {
+            for (int j = 0; j < adjMatrix.size(); j++) {
                 if (adjMatrix[i][j] != 0) {
                 numOfEdges++;
                 }
