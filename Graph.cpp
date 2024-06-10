@@ -66,8 +66,8 @@ namespace ariel {
         Graph gT(n);
         for (int i = 0; i < n; ++i) {
             for (int j = 0; j < n; ++j) {
-                if (adjMatrix[i][j]) {
-                    gT.adjMatrix[j][i] = 1;
+                if (adjMatrix[i][j] !=0) {
+                    gT.adjMatrix[j][i] = adjMatrix[i][j];
                 }
             }
         }
