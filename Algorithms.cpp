@@ -24,9 +24,13 @@
 
         if (!BFS(g, 0)) return "0"; //Check if all nodes are reachable from node 0
 
-        Graph gT = g.getTranspose();
-        if (!BFS(gT, 0)) return "0"; //Check if all nodes can reach node 0 in the transposed graph
+        if(g.get_is_directed()) // we need to check the transposed graph
+        {
+             Graph gT = g.getTranspose();
+            if (!BFS(gT, 0)) return "0"; //Check if all nodes can reach node 0 in the transposed graph
 
+        }
+       
         return "1";
     }
 
@@ -45,7 +49,7 @@
             q.pop();
 
             for (int neighbor = 0; neighbor < n; ++neighbor) {
-                if (g.get_adjMatrix()[node][neighbor] != 0 && !visited[neighbor]) { // Check for non-zero value
+                if (g.get_adjMatrix()[node][neighbor] != 0 && !visited[neighbor]) { 
                     visited[neighbor] = true;
                     q.push(neighbor);
                     ++visitedCount;
@@ -70,13 +74,19 @@
         std::vector<int> prev(n, -1);
         dist[start] = 0;
 
-        std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, std::greater<std::pair<int, int>>> pq;
+        std::priority_queue<std::pair<int, int>, 
+        //create a pair of distance from source to v and v
+        std::vector<std::pair<int, int>>, 
+        //make the priority queue a min-heap
+        std::greater<std::pair<int, int>>> pq;
+
         pq.push({0, start});
 
         while (!pq.empty()) {
             int u = pq.top().second;
             pq.pop();
 
+            // if we arrived to the destination vertex we need
             if (u == end) {
                 return addPath(prev, start, end);
             }
@@ -153,7 +163,7 @@
         std::vector<int> parent(n, -1);
 
         // Check for negative cycles using Bellman-Ford
-        if (g.containsNegativeWeights() && bellmanFord_DetectCycle(g, parent)) {
+        if (bellmanFord_DetectCycle(g, parent)) {
             return "The graph contains a negative cycle";
         }
 
@@ -183,10 +193,15 @@
 
 
     bool Algorithms::DFS_Directed(const Graph& g, int v, std::vector<bool>& visited, std::vector<int>& parent) {
+
+         // Static vector to keep track of nodes in the current recursion stack
         static std::vector<bool> recStack(g.get_adjMatrix().size(), false);
         
+        // If the current node has not been visited yet
         if (!visited[v]) {
+           
             visited[v] = true;
+            // Add the current node to the recursion stack
             recStack[v] = true;
 
             for (int u = 0; u < g.get_adjMatrix().size(); ++u) {
@@ -194,6 +209,8 @@
                     if (!visited[u] && DFS_Directed(g, u, visited, parent)) {
                         parent[u] = v;
                         return true;
+
+                    // If node u is in the recursion stack, a cycle is found  
                     } else if (recStack[u]) {
                         parent[u] = v;
                         return true;
